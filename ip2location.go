@@ -9,6 +9,7 @@ import (
 	"net"
 	"github.com/go-errors/errors"
 	"io"
+	"strings"
 )
 
 const ApiVersion string = "8.0.3"
@@ -629,7 +630,7 @@ func (r *Reader) query(ipaddress string, mode uint32) (record Record, err error)
 				if stroffset, err = readuint32(r.r, rowoffset+r.positionsOffset.country); err != nil {
 					return
 				}
-				if record.CountryName, err = readstr(r.r, + 3); err != nil {
+				if record.CountryName, err = readstr(r.r, stroffset+3); err != nil {
 					return
 				}
 			}
@@ -752,6 +753,8 @@ func (r *Reader) query(ipaddress string, mode uint32) (record Record, err error)
 				if record.Mcc, err = readstr(r.r, stroffset); err != nil {
 					return
 				}
+
+				record.Mcc = strings.Trim(record.Mcc, " -")
 			}
 
 			if mode&MncField != 0 && r.fieldsEnabled.mnc {
@@ -761,6 +764,8 @@ func (r *Reader) query(ipaddress string, mode uint32) (record Record, err error)
 				if record.Mnc, err = readstr(r.r, stroffset); err != nil {
 					return
 				}
+
+				record.Mnc = strings.Trim(record.Mnc, " -")
 			}
 
 			if mode&MobileBrandField != 0 && r.fieldsEnabled.mobilebrand {
@@ -770,6 +775,8 @@ func (r *Reader) query(ipaddress string, mode uint32) (record Record, err error)
 				if record.MobileBrand, err = readstr(r.r, stroffset); err != nil {
 					return
 				}
+
+				record.MobileBrand = strings.Trim(record.MobileBrand, " -")
 			}
 
 			if mode&ElevationField != 0 && r.fieldsEnabled.elevation {
