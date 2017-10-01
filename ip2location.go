@@ -10,6 +10,7 @@ import (
 	"github.com/go-errors/errors"
 	"io"
 	"strings"
+	"io/ioutil"
 )
 
 const ApiVersion string = "8.0.3"
@@ -161,13 +162,22 @@ func FromBytes(b []byte) (*Reader, error) {
 	return FromReader(bytes.NewReader(b))
 }
 
-func FromFile(fpath string) (*Reader, error) {
+func FromFile(fpath string, cached bool) (*Reader, error) {
 	f, err := os.Open(fpath)
 	if err != nil {
 		return nil, err
 	}
 
-	return FromReader(f)
+	if cached {
+		data, err := ioutil.ReadAll(f)
+		if err != nil {
+			return nil, err
+		}
+
+		return FromBytes(data)
+	} else {
+		return FromReader(f)
+	}
 }
 
 func FromReader(r io.ReaderAt) (*Reader, error) {
