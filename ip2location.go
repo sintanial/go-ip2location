@@ -169,6 +169,8 @@ func FromFile(fpath string, cached bool) (*Reader, error) {
 	}
 
 	if cached {
+		defer f.Close()
+
 		data, err := ioutil.ReadAll(f)
 		if err != nil {
 			return nil, err
@@ -305,6 +307,15 @@ func FromReader(r io.ReaderAt) (*Reader, error) {
 	}
 
 	return dbr, nil
+}
+
+func Close(reader *Reader) {
+	c, ok := reader.r.(io.Closer)
+	if !ok {
+		return
+	}
+
+	c.Close()
 }
 
 // get IP type and calculate IP number; calculates index too if exists
